@@ -7,4 +7,5 @@ The production company wants to plan their every move analytically based on data
 
 Here we act as a data analyst and an SQL expert. We have to use SQL to analyse the given data and give recommendations to RSVP Movies based on the insights. 
 
-
+## Data Model
+![ER Diagram for this project](Data_Model.jpg)
