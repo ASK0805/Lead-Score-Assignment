@@ -9,3 +9,6 @@ Here we act as a data analyst and an SQL expert. We have to use SQL to analyse t
 
 ## Data Model
 ![ER Diagram for this project](Data_Model.jpg)
+
+## Dataset
+
