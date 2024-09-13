@@ -93,6 +93,141 @@ Link of dataset : [Dataset](https://github.com/ASK0805/SQL-Project/tree/main/Dat
     GROUP BY month_of_movie
     ORDER BY month_of_movie;
 
+### Q4. How many movies were produced in the USA or India in the year 2019??
+
+    SELECT 	country, count(id) AS 'Total Number Of Movies'
+    FROM movie
+    WHERE year= 2019 AND (country like '%USA%' or country like '%india%');
+
+### Q5. Find the unique list of the genres present in the data set?
+
+    SELECT DISTINCT genre AS 'List Of Genre'
+    FROM genre
+    ORDER BY genre;
+
+### Q6.Which genre had the highest number of movies produced overall?
+
+    SELECT 	G.genre, count(M.id) AS number_of_movies
+    FROM genre AS G
+	  INNER JOIN movie AS M 
+	  ON G.movie_id = M.id
+    GROUP BY genre
+    ORDER BY number_of_movies DESC
+    LIMIT 1;
+
+### Q7. How many movies belong to only one genre?
+
+    WITH only_one_genre AS (
+    SELECT movie_id
+    FROM genre
+    GROUP BY movie_id
+    HAVING count(distinct genre)=1
+    )
+
+    SELECT count(*) AS movie_with_one_genre
+    FROM only_one_genre;
+
+### Q8.What is the average duration of movies in each genre?
+
+    SELECT  g.genre, ROUND(avg(m.duration),2) AS avg_duration
+    FROM genre AS g
+	  INNER JOIN movie AS m
+	  ON g.movie_id = m.id
+    GROUP BY genre;
+
+### Q9.What is the rank of the ‘thriller’ genre of movies among all the genres in terms of number of movies produced?
+
+    WITH number_of_movies AS (
+    SELECT  g.genre, count(m.id) AS movie_number,
+            RANK() OVER ( ORDER BY count(m.id) DESC) AS rank_genre
+    FROM genre AS g
+	  INNER JOIN movie AS m 
+	  ON g.movie_id = m.id
+    GROUP BY genre
+    )
+    SELECT *
+    FROM number_of_movies  
+    WHERE genre = 'Thriller';
+
+### Q10.  Find the minimum and maximum values in  each column of the ratings table except the movie_id column?
+
+    SELECT  MIN(avg_rating) AS min_avg_rating, 
+		        MAX(avg_rating) AS max_avg_rating,
+		        MIN(total_votes) AS min_total_votes, 
+		        MAX(total_votes) AS max_total_votes,
+            MIN(median_rating) AS min_median_rating, 
+            MAX(median_rating) AS max_median_rating
+    FROM ratings;
+
+### Q11. Which are the top 10 movies based on average rating?
+
+    SELECT  m.title, r.avg_rating,
+		        ROW_NUMBER() OVER (ORDER BY r.avg_rating DESC) AS movie_rank
+    FROM movie AS m
+	  INNER JOIN ratings AS r
+	  ON m.id = r.movie_id
+    limit 10;
+
+### Q12. Summarise the ratings table based on the movie counts by median ratings?
+
+    SELECT 	median_rating, 
+		        count(movie_id) AS movie_count
+    FROM ratings
+    GROUP BY median_rating
+    ORDER BY median_rating ;
+
+### Q13. Which production house has produced the most number of hit movies (average rating > 8) ?
+
+    SELECT 	m.production_company, 
+		        count(m.id) AS no_of_movies,
+		        DENSE_RANK() OVER (ORDER BY count(m.id) DESC) AS prod_company_rank
+    FROM movie AS m
+	  INNER JOIN ratings AS r
+	  ON m.id = r.movie_id
+    WHERE avg_rating > 8 AND production_company is not null
+    GROUP BY production_company;
+
+### Q14. How many movies released in each genre during March 2017 in the USA had more than 1,000 votes ?
+    
+    SELECT g.genre, count(m.id) AS movie_count
+    FROM genre AS g
+	  INNER JOIN movie AS m
+	  ON g.movie_id = m.id
+	  INNER JOIN ratings AS r
+	  ON m.id = r.movie_id
+    WHERE year=2017 AND month(m.date_published) = 3 AND country like 'USA' AND total_votes > 1000
+    GROUP BY genre
+    ORDER BY movie_count desc;
+
+### Q15. Find movies of each genre that start with the word ‘The’ and which have an average rating > 8 ?
+
+    SELECT 	m.title, r.avg_rating, g.genre
+    FROM genre AS g
+	  INNER JOIN movie AS m
+	  ON g.movie_id = m.id
+	  INNER JOIN ratings AS r
+	  ON m.id = r.movie_id
+    WHERE title like'The%' AND avg_rating > 8;
+
+    Here apply filter on the basis of median rating
+
+    SELECT 	m.title, r.avg_rating, g.genre
+    FROM genre AS g
+	  INNER JOIN movie AS m
+	  ON g.movie_id = m.id
+	  INNER JOIN ratings AS r
+	  ON m.id = r.movie_id
+    WHERE title like'The%' AND median_rating > 8;
+
+### Q16. Of the movies released between 1 April 2018 and 1 April 2019, how many were given a median rating of 8?
+
+    SELECT 	r.median_rating, count(m.id) AS movie_count
+    FROM movie AS m
+	  INNER JOIN ratings AS r
+	  ON m.id = r.movie_id
+    WHERE date_published BETWEEN '2018-04-01' AND '2019-04-01'  AND median_rating = 8
+    GROUP BY median_rating;
+
 
 
 
