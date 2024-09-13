@@ -23,6 +23,77 @@ movie table have columns like id, title, year, date_published, duration, country
 
 Link of dataset : [Dataset](https://github.com/ASK0805/SQL-Project/tree/main/Dataset)
 
+## Business Problems and Solutions
+
+### Q1. Find the total number of rows in each table of the schema?
+        
+        SELECT count(*) AS 'number of row in director mapping'
+        FROM director_mapping;
+
+        SELECT count(*) AS number_of_rows_genre
+        FROM genre;
+
+        SELECT count(*) AS 'number of row movie'
+        FROM movie;
+
+        SELECT count(*) AS number_of_row_ratings
+        FROM ratings;
+
+        SELECT count(*) AS 'number of row role mapping'
+        FROM role_mapping;
+
+### Q2. Which columns in the movie table have null values?
+  
+    SELECT count(*)
+    FROM movie
+    WHERE id IS NULL;
+  
+    SELECT count(*)
+    FROM movie
+    WHERE title IS NULL;
+  
+    SELECT count(*)
+    FROM movie
+    WHERE year IS NULL;
+  
+    SELECT count(*)
+    FROM movie
+    WHERE date_published IS NULL;
+  
+    SELECT count(*)
+    FROM movie
+    WHERE duration IS NULL;
+  
+    SELECT count(*)
+    FROM movie
+    WHERE country IS NULL;
+  
+    SELECT count(*)
+    FROM movie
+    WHERE worlwide_gross_income IS NULL;
+  
+    SELECT count(*)
+    FROM movie
+    WHERE languages IS NULL;
+  
+    SELECT count(*)
+    FROM movie
+    WHERE production_company IS NULL;
+
+### Q3. Find the total number of movies released each year? How does the trend look month wise?
+
+    SELECT 	year, count(id) AS number_of_movies
+    FROM movie
+    GROUP BY year;
+
+    Second Part of the question 
+
+    SELECT 	month(date_published) AS month_of_movie, count(id) AS number_of_movies
+    FROM movie
+    GROUP BY month_of_movie
+    ORDER BY month_of_movie;
+
+
 
 
 
