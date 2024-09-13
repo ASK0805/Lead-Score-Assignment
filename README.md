@@ -131,8 +131,8 @@ Link of dataset : [Dataset](https://github.com/ASK0805/SQL-Project/tree/main/Dat
 
     SELECT  g.genre, ROUND(avg(m.duration),2) AS avg_duration
     FROM genre AS g
-	  INNER JOIN movie AS m
-	  ON g.movie_id = m.id
+    INNER JOIN movie AS m
+    ON g.movie_id = m.id
     GROUP BY genre;
 
 ### Q9.What is the rank of the ‘thriller’ genre of movies among all the genres in terms of number of movies produced?
@@ -141,8 +141,8 @@ Link of dataset : [Dataset](https://github.com/ASK0805/SQL-Project/tree/main/Dat
     SELECT  g.genre, count(m.id) AS movie_number,
             RANK() OVER ( ORDER BY count(m.id) DESC) AS rank_genre
     FROM genre AS g
-	  INNER JOIN movie AS m 
-	  ON g.movie_id = m.id
+    INNER JOIN movie AS m 
+    ON g.movie_id = m.id
     GROUP BY genre
     )
     SELECT *
@@ -152,9 +152,9 @@ Link of dataset : [Dataset](https://github.com/ASK0805/SQL-Project/tree/main/Dat
 ### Q10.  Find the minimum and maximum values in  each column of the ratings table except the movie_id column?
 
     SELECT  MIN(avg_rating) AS min_avg_rating, 
-		        MAX(avg_rating) AS max_avg_rating,
-		        MIN(total_votes) AS min_total_votes, 
-		        MAX(total_votes) AS max_total_votes,
+    	    MAX(avg_rating) AS max_avg_rating,
+	    MIN(total_votes) AS min_total_votes, 
+	    MAX(total_votes) AS max_total_votes,
             MIN(median_rating) AS min_median_rating, 
             MAX(median_rating) AS max_median_rating
     FROM ratings;
@@ -228,7 +228,88 @@ Link of dataset : [Dataset](https://github.com/ASK0805/SQL-Project/tree/main/Dat
     WHERE date_published BETWEEN '2018-04-01' AND '2019-04-01'  AND median_rating = 8
     GROUP BY median_rating;
 
+### Q17. Do German movies get more votes than Italian movies?
 
+ 	(SELECT sum(r.total_votes) AS no_of_votes, m.languages
+	FROM ratings AS r
+	INNER JOIN movie AS m
+	ON r.movie_id = m.id
+	WHERE languages like '%german%'
+ 	)
+	UNION
+	(SELECT sum(r.total_votes), m.languages
+	FROM 
+	ratings AS r
+	INNER JOIN movie AS m
+	ON r.movie_id = m.id
+	WHERE languages like '%Italian%'
+ 	);
+
+### Q18. Which columns in the names table have null values ?
+
+	SELECT 	SUM(CASE WHEN name IS NULL THEN 1 ELSE 0 END) AS name_nulls, 
+		SUM(CASE WHEN height IS NULL THEN 1 ELSE 0 END) AS height_nulls, 
+        	SUM(CASE WHEN date_of_birth IS NULL THEN 1 ELSE 0 END) AS date_of_birth_nulls, 
+       	 	SUM(CASE WHEN known_for_movies IS NULL THEN 1 ELSE 0 END) AS known_for_movies_nulls 
+	FROM names;
+
+	SECOND METHOD : 
+
+	SELECT count(*)
+	FROM names
+	WHERE name IS NULL;
+
+	SELECT count(*)
+	FROM names
+	WHERE height IS NULL;
+
+	SELECT count(*)
+	FROM names
+	WHERE date_of_birth IS NULL;
+
+	SELECT count(*)
+	FROM names
+	WHERE known_for_movies IS NULL;
+
+ ### Q19. Who are the top three directors in the top three genres whose movies have an average rating > 8?
+
+ 	WITH director_of_movie AS ( SELECT  g.genre, count(g.movie_id) AS movie_count,
+				DENSE_RANK() OVER (ORDER BY count(g.movie_id) DESC) AS movie_dense_rank
+	FROM genre AS g
+	INNER JOIN ratings AS r
+	ON g.movie_id = r.movie_id
+	WHERE r.avg_rating > 8
+	GROUP BY g.genre
+	LIMIT 3
+ 	)
+	SELECT 	n.NAME AS director_name, 
+		Count(d.movie_id) AS movie_count 
+	FROM director_mapping AS d 
+    	INNER JOIN genre g 
+    	USING (movie_id) 
+    	INNER JOIN names AS n 
+    	ON n.id = d.name_id 
+    	INNER JOIN director_of_movie 
+    	USING (genre) 
+    	INNER JOIN ratings 
+    	USING (movie_id) 
+	WHERE avg_rating > 8 
+	GROUP BY NAME 
+	ORDER BY movie_count DESC 
+	limit 3 ;
+	
+### Q20. Who are the top two actors whose movies have a median rating >= 8 ?
+
+	SELECT 	n.name AS actor_name, 
+		count(rm.movie_id) AS movie_count
+	FROM role_mapping AS rm
+	INNER JOIN names AS n
+	ON rm.name_id = n.id
+	INNER JOIN ratings AS r
+	ON rm.movie_id = r.movie_id
+	WHERE rm.category = 'actor' AND r.median_rating >= 8
+	GROUP BY n.name 
+	ORDER BY movie_count DESC;
 
 
 
