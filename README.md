@@ -131,8 +131,8 @@ Link of dataset : [Dataset](https://github.com/ASK0805/SQL-Project/tree/main/Dat
 
     SELECT  g.genre, ROUND(avg(m.duration),2) AS avg_duration
     FROM genre AS g
-    INNER JOIN movie AS m
-    ON g.movie_id = m.id
+    	INNER JOIN movie AS m
+    	ON g.movie_id = m.id
     GROUP BY genre;
 
 ### Q9.What is the rank of the ‘thriller’ genre of movies among all the genres in terms of number of movies produced?
@@ -141,8 +141,8 @@ Link of dataset : [Dataset](https://github.com/ASK0805/SQL-Project/tree/main/Dat
     SELECT  g.genre, count(m.id) AS movie_number,
             RANK() OVER ( ORDER BY count(m.id) DESC) AS rank_genre
     FROM genre AS g
-    INNER JOIN movie AS m 
-    ON g.movie_id = m.id
+    	INNER JOIN movie AS m 
+    	ON g.movie_id = m.id
     GROUP BY genre
     )
     SELECT *
@@ -162,7 +162,7 @@ Link of dataset : [Dataset](https://github.com/ASK0805/SQL-Project/tree/main/Dat
 ### Q11. Which are the top 10 movies based on average rating?
 
     SELECT  m.title, r.avg_rating,
-		        ROW_NUMBER() OVER (ORDER BY r.avg_rating DESC) AS movie_rank
+		ROW_NUMBER() OVER (ORDER BY r.avg_rating DESC) AS movie_rank
     FROM movie AS m
 	  INNER JOIN ratings AS r
 	  ON m.id = r.movie_id
@@ -170,17 +170,16 @@ Link of dataset : [Dataset](https://github.com/ASK0805/SQL-Project/tree/main/Dat
 
 ### Q12. Summarise the ratings table based on the movie counts by median ratings?
 
-    SELECT 	median_rating, 
-		        count(movie_id) AS movie_count
+    SELECT 	median_rating, count(movie_id) AS movie_count
     FROM ratings
     GROUP BY median_rating
     ORDER BY median_rating ;
 
 ### Q13. Which production house has produced the most number of hit movies (average rating > 8) ?
 
-    SELECT 	m.production_company, 
-		        count(m.id) AS no_of_movies,
-		        DENSE_RANK() OVER (ORDER BY count(m.id) DESC) AS prod_company_rank
+    SELECT m.production_company, 
+		count(m.id) AS no_of_movies,
+		DENSE_RANK() OVER (ORDER BY count(m.id) DESC) AS prod_company_rank
     FROM movie AS m
 	  INNER JOIN ratings AS r
 	  ON m.id = r.movie_id
@@ -201,7 +200,7 @@ Link of dataset : [Dataset](https://github.com/ASK0805/SQL-Project/tree/main/Dat
 
 ### Q15. Find movies of each genre that start with the word ‘The’ and which have an average rating > 8 ?
 
-    SELECT 	m.title, r.avg_rating, g.genre
+    SELECT m.title, r.avg_rating, g.genre
     FROM genre AS g
 	  INNER JOIN movie AS m
 	  ON g.movie_id = m.id
@@ -211,7 +210,7 @@ Link of dataset : [Dataset](https://github.com/ASK0805/SQL-Project/tree/main/Dat
 
     Here apply filter on the basis of median rating
 
-    SELECT 	m.title, r.avg_rating, g.genre
+    SELECT m.title, r.avg_rating, g.genre
     FROM genre AS g
 	  INNER JOIN movie AS m
 	  ON g.movie_id = m.id
@@ -232,16 +231,15 @@ Link of dataset : [Dataset](https://github.com/ASK0805/SQL-Project/tree/main/Dat
 
  	(SELECT sum(r.total_votes) AS no_of_votes, m.languages
 	FROM ratings AS r
-	INNER JOIN movie AS m
-	ON r.movie_id = m.id
+		INNER JOIN movie AS m
+		ON r.movie_id = m.id
 	WHERE languages like '%german%'
  	)
 	UNION
 	(SELECT sum(r.total_votes), m.languages
-	FROM 
-	ratings AS r
-	INNER JOIN movie AS m
-	ON r.movie_id = m.id
+	FROM ratings AS r
+		INNER JOIN movie AS m
+		ON r.movie_id = m.id
 	WHERE languages like '%Italian%'
  	);
 
@@ -271,13 +269,13 @@ Link of dataset : [Dataset](https://github.com/ASK0805/SQL-Project/tree/main/Dat
 	FROM names
 	WHERE known_for_movies IS NULL;
 
- ### Q19. Who are the top three directors in the top three genres whose movies have an average rating > 8?
+### Q19. Who are the top three directors in the top three genres whose movies have an average rating > 8?
 
  	WITH director_of_movie AS ( SELECT  g.genre, count(g.movie_id) AS movie_count,
 				DENSE_RANK() OVER (ORDER BY count(g.movie_id) DESC) AS movie_dense_rank
 	FROM genre AS g
-	INNER JOIN ratings AS r
-	ON g.movie_id = r.movie_id
+		INNER JOIN ratings AS r
+		ON g.movie_id = r.movie_id
 	WHERE r.avg_rating > 8
 	GROUP BY g.genre
 	LIMIT 3
@@ -285,44 +283,44 @@ Link of dataset : [Dataset](https://github.com/ASK0805/SQL-Project/tree/main/Dat
 	SELECT 	n.NAME AS director_name, 
 		Count(d.movie_id) AS movie_count 
 	FROM director_mapping AS d 
-    	INNER JOIN genre g 
-    	USING (movie_id) 
-    	INNER JOIN names AS n 
-    	ON n.id = d.name_id 
-    	INNER JOIN director_of_movie 
-    	USING (genre) 
-    	INNER JOIN ratings 
-    	USING (movie_id) 
+    		INNER JOIN genre g 
+    		USING (movie_id) 
+    		INNER JOIN names AS n 
+    		ON n.id = d.name_id 
+    		INNER JOIN director_of_movie 
+    		USING (genre) 
+    		INNER JOIN ratings 
+    		USING (movie_id) 
 	WHERE avg_rating > 8 
 	GROUP BY NAME 
 	ORDER BY movie_count DESC 
 	limit 3 ;
 	
-### Q20. Who are the top two actors whose movies have a median rating >= 8 ?
+ ### Q20. Who are the top two actors whose movies have a median rating >= 8 ?
 
 	SELECT 	n.name AS actor_name, 
 		count(rm.movie_id) AS movie_count
 	FROM role_mapping AS rm
-	INNER JOIN names AS n
-	ON rm.name_id = n.id
-	INNER JOIN ratings AS r
-	ON rm.movie_id = r.movie_id
+		INNER JOIN names AS n
+		ON rm.name_id = n.id
+		INNER JOIN ratings AS r
+		ON rm.movie_id = r.movie_id
 	WHERE rm.category = 'actor' AND r.median_rating >= 8
 	GROUP BY n.name 
 	ORDER BY movie_count DESC;
 
- ### Q21. Which are the top three production houses based on the number of votes received by their movies ?
+### Q21. Which are the top three production houses based on the number of votes received by their movies ?
 
  	SELECT 	m.production_company, 
 		sum(r.total_votes) AS vote_count,
         	ROW_NUMBER() OVER (ORDER BY sum(r.total_votes) DESC) AS prod_comp_rank
 	FROM movie AS m
-	INNER JOIN ratings AS r
-	ON m.id = r.movie_id
+		INNER JOIN ratings AS r
+		ON m.id = r.movie_id
 	GROUP BY production_company
 	LIMIT 3;
 
- ### Q22. Rank actors with movies released in India based on their average ratings. Which actor is at the top of the list?
+### Q22. Rank actors with movies released in India based on their average ratings. Which actor is at the top of the list?
 	(Note: The actor should have acted in at least five Indian movies.) 
 
  	WITH actor_summary AS (
@@ -331,12 +329,12 @@ Link of dataset : [Dataset](https://github.com/ASK0805/SQL-Project/tree/main/Dat
        			count(m.id) AS movie_count, 
 			Round(Sum(avg_rating * total_votes) / Sum(total_votes), 2) AS actor_avg_rating
 		FROM role_mapping as rm
-		INNER JOIN names as n
-		ON rm.name_id = n.id
-		INNER JOIN ratings as r
-		ON rm.movie_id = r.movie_id
-		INNER JOIN movie as m
-		ON r.movie_id = m.id
+			INNER JOIN names as n
+			ON rm.name_id = n.id
+			INNER JOIN ratings as r
+			ON rm.movie_id = r.movie_id
+			INNER JOIN movie as m
+			ON r.movie_id = m.id
 		WHERE category = 'actor' AND country like '%india%'
 		GROUP BY name
   		)
@@ -347,7 +345,7 @@ Link of dataset : [Dataset](https://github.com/ASK0805/SQL-Project/tree/main/Dat
 	FROM actor_summary
 	WHERE movie_count >= 5;
 
- ### Q23.Find out the top five actresses in Hindi movies released in India based on their average ratings? 
+### Q23.Find out the top five actresses in Hindi movies released in India based on their average ratings? 
 	(Note: The actresses should have acted in at least three Indian movies.)
 
  	WITH actress_summary AS (
@@ -356,12 +354,12 @@ Link of dataset : [Dataset](https://github.com/ASK0805/SQL-Project/tree/main/Dat
 			count(m.id) AS movie_count, 
 			Round(Sum(avg_rating * total_votes) / Sum(total_votes), 2) AS actress_avg_rating
 		FROM role_mapping AS rm
-		INNER JOIN names AS n
-		ON rm.name_id = n.id
-		INNER JOIN ratings AS r
-		ON rm.movie_id = r.movie_id
-		INNER JOIN movie as m
-		ON r.movie_id = m.id
+			INNER JOIN names AS n
+			ON rm.name_id = n.id
+			INNER JOIN ratings AS r
+			ON rm.movie_id = r.movie_id
+			INNER JOIN movie as m
+			ON r.movie_id = m.id
 		WHERE category = 'actress' AND country like '%india%' AND languages like '%hindi%'
 		GROUP BY name
   		)
@@ -382,10 +380,10 @@ Link of dataset : [Dataset](https://github.com/ASK0805/SQL-Project/tree/main/Dat
    	WITH thriller_movie_summary AS(
 		SELECT 	id, title, genre, avg_rating 
 		FROM movie AS m
-		INNER JOIN genre AS g
-		ON m.id = g.movie_id
-		INNER JOIN ratings AS r
-		ON g.movie_id = r.movie_id 
+			INNER JOIN genre AS g
+			ON m.id = g.movie_id
+			INNER JOIN ratings AS r
+			ON g.movie_id = r.movie_id 
 		WHERE genre = 'thriller'
 		)
 		SELECT title,
@@ -403,8 +401,8 @@ Link of dataset : [Dataset](https://github.com/ASK0805/SQL-Project/tree/main/Dat
 		sum(round(avg(duration),2)) OVER (ORDER BY genre) AS running_total_duration,
        	 	AVG(round(avg(duration),2)) OVER (ORDER BY genre) AS moving_avg_duration
 	FROM genre AS g
-	INNER JOIN movie as m
-	ON g.movie_id = m.id
+		INNER JOIN movie as m
+		ON g.movie_id = m.id
 	GROUP BY genre;
 
  ### Q26. Which are the five highest-grossing movies of each year that belong to the top three genres ?
@@ -421,22 +419,22 @@ Link of dataset : [Dataset](https://github.com/ASK0805/SQL-Project/tree/main/Dat
 			CAST(REPLACE(IFNULL(worlwide_gross_income,0),'$ ','') AS DECIMAL(10)) AS worldwide_gross_income_$,
 			ROW_NUMBER() OVER (PARTITION BY YEAR ORDER BY CAST(REPLACE(IFNULL(worlwide_gross_income,0),'$ ','') AS DECIMAL(10)) DESC) AS movie_rank
 		FROM movie AS m
-		INNER JOIN genre AS g
-		ON m.id = g.movie_id
+			INNER JOIN genre AS g
+			ON m.id = g.movie_id
 		WHERE genre IN(SELECT * FROM   top_3_genre) 
 		)
  	SELECT *
   	FROM   top_movie
  	WHERE  movie_rank<=5;
 
-  ###  Q27.  Which are the top two production houses that have produced the highest number of hits (median rating >= 8) among multilingual movies ?
+###  Q27.  Which are the top two production houses that have produced the highest number of hits (median rating >= 8) among multilingual movies ?
 
   	SELECT  m.production_company,
 		COUNT(m.production_company) AS movie_count ,
 		DENSE_RANK() OVER(ORDER BY COUNT(m.production_company) DESC) AS prod_comp_rank
 	FROM movie AS m
-	INNER JOIN ratings AS r
-	ON m.id = r.movie_id
+		INNER JOIN ratings AS r
+		ON m.id = r.movie_id
 	WHERE median_rating >=8 AND languages REGEXP ','
 	GROUP BY production_company
 	LIMIT 2;
