@@ -11,4 +11,19 @@ Here we act as a data analyst and an SQL expert. We have to use SQL to analyse t
 ![ER Diagram for this project](Data_Model.jpg)
 
 ## Dataset
+Here we have 6 tables which are connected to each other with primary key and name of tables are movie, genre, director_mapping, role_mapping, ratings, names.
+movie table have columns like id, title, year, date_published, duration, country, worldwide_gross_income, languages, production_company.
+  - genre table have columns like movie_id, genre.
+  - director_mapping have columns like movie_id, name_id. 
+  - role_mapping have columns like movie_id, name_id, category.
+  - name have columns like id name, height, date_of_birth, known_for_movies.
+  - ratings have columns like movie_id, avg_rating, total_votes, median_rating.
+
+Link of dataset : [Dataset](https://github.com/ASK0805/SQL-Project/tree/main/Dataset)
+
+
+
+
+
+ 
 
